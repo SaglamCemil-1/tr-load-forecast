@@ -7,11 +7,11 @@ consumption = get_data(
     startDate="2026-09-15",
     endDate="2026-09-15",
 ).json()
-print(consumption["items"][0])
+#print(consumption["items"])
 
 load_plan = get_data(
     concept="load-estimation-plan",
     startDate="2026-09-15",
     endDate="2026-09-15",
 ).json()
-print(load_plan["items"][0])
+#print(load_plan["page"])

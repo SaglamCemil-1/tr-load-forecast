@@ -73,7 +73,7 @@ def get_start_end(year:int,month:int):
     last_day = next_month_first_Day - timedelta(days=1)
     return str(first_Day),str(last_day)
 
-def get_month(start:str,end:str,concept="realtime-consumption"):
+def get_month(start:str,end:str,bytime:str,concept="realtime-consumption"):
     """
     start,end: 'YYYY-MM-DD'
     return: all rows
@@ -92,7 +92,12 @@ def get_month(start:str,end:str,concept="realtime-consumption"):
         month+=1
         if month>12:
             month,year =1,year+1
-
+    bytimelist = []
+    if bytime:
+        for _ in allrows:
+            if _["time"]== bytime:
+                bytimelist.append(_)
+        return bytimelist
     return allrows
 
 def save_csv(rows:list,file_path:str):

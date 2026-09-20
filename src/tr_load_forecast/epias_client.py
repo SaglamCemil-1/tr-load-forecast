@@ -3,6 +3,9 @@ import os
 from dotenv import load_dotenv
 from datetime import date,timedelta
 import time
+import csv
+import numpy
+
 
 load_dotenv()
 _tgt = None
@@ -51,6 +54,8 @@ def safely_get_data(maxtry=3,awaittime=5,**kwargs):
             if data.status_code == 200:
                 return data.json()
             print(f"try: {try_}, statuscode: {data.status_code}")
+            if data.status_code == 429:
+                time.sleep(3**(try_-1)*awaittime)
         except requests.RequestException as e:
             print(f"try: {try_},exception: {e}")
         time.sleep(awaittime)
@@ -83,15 +88,32 @@ def get_month(start:str,end:str,concept="realtime-consumption"):
         data = safely_get_data(concept=concept,startDate=month_first,endDate=month_last)
         allrows.extend(data["items"])
 
+        time.sleep(1)
         month+=1
         if month>12:
             month,year =1,year+1
 
     return allrows
 
+def save_csv(rows:list,file_path:str):
+    if not rows:
+        print("no rows!")
+        return 
+    
+    with open(file_path,"w",newline="",encoding="utf-8") as f:
+        writer = csv.DictWriter(f,fieldnames=rows[0].keys())
+        writer.writeheader()
+        writer.writerows(rows)
+    print(f"{len(rows)} rows-> {file_path}")
+
+
 
 ####      
 if __name__ == "__main__":
-    dat = get_month("2026-07-01", "2026-09-01")
-    print(dat[0])
-    print(len(dat))
+    os.makedirs("data",exist_ok=True)
+
+    consumption = get_month("2020-01-01", "2026-09-17", concept="realtime-consumption")
+    save_csv(consumption, "data/consumption.csv")
+
+    plan = get_month("2020-01-01", "2026-09-17", concept="load-estimation-plan")
+    save_csv(plan, "data/load_plan.csv")

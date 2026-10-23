@@ -16,7 +16,7 @@ def get_TGT(
     url="https://giris.epias.com.tr/cas/v1/tickets",
     headers = {
     "Content-Type": "application/x-www-form-urlencoded",
-    "Accept": "text/plain",
+    "Accept": "text/plain"
     }
 ):
     """ returns -> respond """
@@ -73,7 +73,7 @@ def get_start_end(year:int,month:int):
     last_day = next_month_first_Day - timedelta(days=1)
     return str(first_Day),str(last_day)
 
-def get_month(start:str,end:str,bytime:str,concept="realtime-consumption"):
+def get_month(start:str,end:str,bytime=None,concept="realtime-consumption"):
     """
     start,end: 'YYYY-MM-DD'
     return: all rows
@@ -88,7 +88,7 @@ def get_month(start:str,end:str,bytime:str,concept="realtime-consumption"):
         data = safely_get_data(concept=concept,startDate=month_first,endDate=month_last)
         allrows.extend(data["items"])
 
-        time.sleep(1)
+        #time.sleep(1)
         month+=1
         if month>12:
             month,year =1,year+1
@@ -117,8 +117,8 @@ def save_csv(rows:list,file_path:str):
 if __name__ == "__main__":
     os.makedirs("data",exist_ok=True)
 
-    consumption = get_month("2020-01-01", "2026-09-17", concept="realtime-consumption")
-    save_csv(consumption, "data/consumption.csv")
+    consumption = get_month("2026-01-01", "2026-10-01", concept="realtime-consumption")
+    save_csv(consumption, "../../data/consumption.csv")
 
-    plan = get_month("2020-01-01", "2026-09-17", concept="load-estimation-plan")
-    save_csv(plan, "data/load_plan.csv")
+    plan = get_month("2026-01-01", "2026-10-01", concept="load-estimation-plan")
+    save_csv(plan, "../../data/load_plan.csv")

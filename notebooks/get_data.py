@@ -1,22 +1,10 @@
-import sys, os
-import numpy as np
 from tr_load_forecast.epias_client import *
 
-# sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src"))
+if __name__ == "__main__":
+    #os.makedirs("data",exist_ok=True)
 
-consumption = get_data(
-    concept="realtime-consumption",
-    startDate="2026-09-15",
-    endDate="2026-09-15",
-).json()
-#print(consumption["items"])
+    consumption = get_month("2026-01-01", "2026-10-01", concept="realtime-consumption")
+    save_csv(consumption, consumption_path)
 
-load_plan = get_data(
-    concept="load-estimation-plan",
-    startDate="2026-09-15",
-    endDate="2026-09-15",
-).json()
-#print(load_plan["page"])
-visualize_month = get_month("2026-08-17", "2026-09-17", concept="realtime-consumption",bytime="22:00")
-for hour in visualize_month:
-    print(f"DATE: {hour["date"][:10]},Consumption: {hour["consumption"]} ")
+    plan = get_month("2026-01-01", "2026-10-01", concept="load-estimation-plan")
+    save_csv(plan, load_plan_path)

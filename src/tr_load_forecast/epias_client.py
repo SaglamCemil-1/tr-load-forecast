@@ -4,8 +4,9 @@ from dotenv import load_dotenv
 from datetime import date,timedelta
 import time
 import csv
-import numpy
 
+consumption_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..","..", "data", "consumption.csv")
+load_plan_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..","..", "data", "load_plan.csv")
 
 load_dotenv()
 _tgt = None
@@ -111,14 +112,4 @@ def save_csv(rows:list,file_path:str):
         writer.writerows(rows)
     print(f"{len(rows)} rows-> {file_path}")
 
-
-
-####      
-if __name__ == "__main__":
-    os.makedirs("data",exist_ok=True)
-
-    consumption = get_month("2026-01-01", "2026-10-01", concept="realtime-consumption")
-    save_csv(consumption, "../../data/consumption.csv")
-
-    plan = get_month("2026-01-01", "2026-10-01", concept="load-estimation-plan")
-    save_csv(plan, "../../data/load_plan.csv")
+####

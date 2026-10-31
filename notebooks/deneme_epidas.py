@@ -1,11 +1,8 @@
-import os
-from cmath import nan
-
 import numpy as np
-import csv
+from src.tr_load_forecast.epias_client import *
 
-aim_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data", "consumption.csv")
-aim_path_2 = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data", "load_plan.csv")
+aim_path = consumption_path #os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data", "consumption.csv")
+aim_path_2 = load_plan_path #os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data", "load_plan.csv")
 
 def read_csv(path,consumption_col,date_col)->list:
     """ path: file path .csv
@@ -22,7 +19,7 @@ def read_csv(path,consumption_col,date_col)->list:
 
 def align_rows(array_1,array_2):
     minimum_Val = min(len(array_1),len(array_2))
-    minimum_Val -= minimum_Val%(24*7)
+    minimum_Val -= minimum_Val%24
     return [array_1[:minimum_Val],array_2[:minimum_Val]]
 
 def calculate_mape(array_1, array_2)->list:
@@ -35,8 +32,8 @@ def calculate_mape(array_1, array_2)->list:
         raise ValueError ("array lenghts are not same")
     ape = abs(((array_1-array_2)/array_1) * 100)
     ape_mean = np.nanmean(ape)
-    dayly_mean = np.nanmean(ape.reshape(day,24),axis=1) #day1_day2
-    hourly_mean = np.nanmean(ape.reshape(day,24),axis=0)  #hour1_hour2
+    dayly_mean = np.nanmean(ape.reshape(day,24),axis=1)
+    hourly_mean = np.nanmean(ape.reshape(day,24),axis=0)
 
     return [dayly_mean,hourly_mean,ape_mean]
 
@@ -52,17 +49,16 @@ for t in range(len(consumption_list[1])):
 #
 consumption= np.array(consumption_list[0])
 estimation = np.array(estimation_plan[0])
-if mismatched_indicies != None:
+if mismatched_indicies is not None:
     estimation = np.insert(estimation,mismatched_indicies,np.full(24,np.nan))
 consumption,estimation = align_rows(consumption,estimation)
 
 day_count = len(consumption) // 24
 week_count = day_count // 7
-
 new_matris_dh = consumption.reshape((day_count,24))
 hourly_avg = np.mean(new_matris_dh,axis=0)
 day_avg = np.mean(new_matris_dh,axis=1)
-day_avg_f = day_avg.reshape((week_count,7))
+day_avg_f = day_avg[:week_count*7].reshape((week_count,7))
 weekdays_avg = np.mean(day_avg_f,axis=0)
 week_avg = np.mean(day_avg_f,axis=1)
 
